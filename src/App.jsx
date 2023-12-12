@@ -40,7 +40,12 @@ function App() {
 
     for (let i = 0; i < rec.length; i++) {
       const n = rec[i];
-      const path = "http://" + n.ip + ":" + n.port + "/" + n.complemento;
+      const path =
+        "http" + n.ssl
+          ? "s"
+          : "" + "://" + n.ip + n.port
+          ? ":" + n.port
+          : "" + "/" + n.complemento;
       const status = await test(path, n.clave);
       const use = { ...n, status };
 
@@ -76,7 +81,7 @@ function App() {
       setAllClusters(
         JSON.stringify([
           ...clusters,
-          { nombre, id: clusters[clusters.length - 1].id ?? 0 + 1 },
+          { nombre, id: clusters[clusters.length - 1].id + 1 },
         ])
       );
     else setAllClusters(JSON.stringify([...clusters, { nombre, id: 1 }]));
@@ -93,6 +98,7 @@ function App() {
 
     const nombre = formData.get("nombreRegistro");
     const ip = formData.get("ip");
+    const ssl = formData.get("ssl") === "on";
     const port = formData.get("port");
     const grupo = formData.get("grupo");
     const complemento = formData.get("complemento");
@@ -103,6 +109,7 @@ function App() {
         JSON.stringify([
           ...records,
           {
+            ssl,
             ip,
             port,
             grupo,
@@ -118,6 +125,7 @@ function App() {
         JSON.stringify([
           ...records,
           {
+            ssl,
             ip,
             port,
             grupo,
@@ -192,6 +200,15 @@ function App() {
           id="clave"
           name="clave"
         />
+        <label>SSL</label>
+        <div className="flex justify-start items-center">
+          <input
+            className="border p-2"
+            type="checkbox"
+            id="ssl"
+            name="ssl"
+          />
+        </div>
         <label>Grupo</label>
         <select
           className="border p-2"
